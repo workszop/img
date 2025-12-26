@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Anatomy Explorer 🔬</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0e14;
+            --bg-card: #151a22;
+            --bg-highlight: #1c232e;
+            --accent-cyan: #00d4ff;
+            --accent-magenta: #ff00aa;
+            --accent-yellow: #ffee00;
+            --accent-green: #00ff88;
+            --text-primary: #e8eaed;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .subtitle span {
+            color: var(--accent-cyan);
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            background: var(--bg-card);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .upload-zone:hover::before {
+            left: 100%;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-highlight);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            filter: grayscale(0.5);
+        }
+
+        .upload-zone h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-zone p {
+            color: var(--text-secondary);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Main Grid Layout */
+        .explorer-grid {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .explorer-grid.active {
+            display: grid;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.08);
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-highlight);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header .icon {
+            font-size: 1.3rem;
+        }
+
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Metadata Section */
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metadata-item {
+            background: var(--bg-dark);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .metadata-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .metadata-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: var(--accent-cyan);
+            word-break: break-all;
+        }
+
+        /* Binary Data */
+        .binary-container {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.8;
+            border: 1px solid var(--border);
+        }
+
+        .binary-row {
+            display: flex;
+            gap: 1rem;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .binary-offset {
+            color: var(--accent-magenta);
+            min-width: 70px;
+        }
+
+        .binary-hex {
+            color: var(--accent-green);
+            flex: 1;
+            word-spacing: 4px;
+        }
+
+        .binary-ascii {
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        /* Image Preview */
+        .image-preview-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .size-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Pixel Grid Overlay */
+        .pixel-explorer {
+            position: relative;
+        }
+
+        .pixel-canvas-container {
+            position: relative;
+            display: inline-block;
+            background: repeating-conic-gradient(#333 0% 25%, #222 0% 50%) 50% / 20px 20px;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        #pixelCanvas {
+            image-rendering: pixelated;
+            cursor: crosshair;
+        }
+
+        .pixel-info {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 0.75rem;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .pixel-info.visible {
+            display: block;
+        }
+
+        .pixel-color-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            border: 2px solid white;
+        }
+
+        .pixel-coords {
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .pixel-rgb {
+            color: var(--accent-green);
+        }
+
+        .pixel-hex {
+            color: var(--accent-magenta);
+        }
+
+        .pixel-binary {
+            color: var(--accent-yellow);
+            font-size: 0.65rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: var(--bg-dark);
+            height: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: var(--bg-highlight);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            border-color: var(--accent-cyan);
+        }
+
+        .btn.active {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+        }
+
+        /* Full Width Cards */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Encoding explanation */
+        .encoding-explanation {
+            background: var(--bg-highlight);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 3px solid var(--accent-yellow);
+        }
+
+        .encoding-explanation h4 {
+            color: var(--accent-yellow);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .encoding-explanation p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .encoding-explanation code {
+            background: var(--bg-dark);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .explorer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .metadata-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+        .card:nth-child(5) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 Image Anatomy Explorer</h1>
+            <p class="subtitle">See what's <span>really</span> inside your images</p>
+        </header>
+
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📁</div>
+            <h3>Drop an image here</h3>
+            <p>or click to browse (PNG, JPG, GIF, WebP)</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="explorer-grid" id="explorerGrid">
+            <!-- Metadata Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📋</span>
+                    <h2>File Metadata</h2>
+                </div>
+                <div class="card-body">
+                    <div class="metadata-grid" id="metadataGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="encoding-explanation">
+                        <h4>💡 What is Metadata?</h4>
+                        <p>Metadata is "data about data" — information stored alongside your image like file name, size, and format. The computer uses this to know how to read the file!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Original vs Resized -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📐</span>
+                    <h2>Size Comparison</h2>
+                </div>
+                <div class="card-body">
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Scale:</label>
+                            <input type="range" id="scaleSlider" min="10" max="100" value="50">
+                            <span id="scaleValue">50%</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <div class="image-preview-container" style="flex: 1;">
+                            <span class="size-badge" id="originalSize">Original</span>
+                            <img id="originalPreview" class="preview-image" alt="Original">
+                        </div>
+                        <div class="image-preview-container" style="flex: 1;">
+                            <span class="size-badge" id="resizedSize">Resized</span>
+                            <img id="resizedPreview" class="preview-image" alt="Resized">
+                        </div>
+                    </div>
+                    <div class="encoding-explanation">
+                        <h4>💡 How Resizing Works</h4>
+                        <p>When you shrink an image, the computer must decide which pixels to keep. This is called <code>downsampling</code>. Making images smaller reduces file size but loses detail!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Binary Data -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <span class="icon">🔢</span>
+                    <h2>Raw Binary Data (First 512 bytes)</h2>
+                </div>
+                <div class="card-body">
+                    <div class="binary-container" id="binaryContainer">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--accent-magenta);"></div>
+                            <span>Offset (position in file)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--accent-green);"></div>
+                            <span>Hexadecimal bytes</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--text-secondary);"></div>
+                            <span>ASCII representation</span>
+                        </div>
+                    </div>
+                    <div class="encoding-explanation">
+                        <h4>💡 What is Binary Data?</h4>
+                        <p>Computers store everything as numbers. Each <code>byte</code> (8 bits) can hold a value from 0-255. Here we show bytes in <code>hexadecimal</code> (base-16) because it's more compact: <code>FF</code> = 255, <code>00</code> = 0. The first bytes often contain the file's "magic number" — a signature that identifies the file type!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pixel Explorer -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <span class="icon">🎨</span>
+                    <h2>Pixel Explorer</h2>
+                </div>
+                <div class="card-body pixel-explorer">
+                    <div class="controls">
+                        <div class="control-group">
+                            <label>Resolution:</label>
+                            <input type="range" id="resolutionSlider" min="8" max="64" value="32">
+                            <span id="resolutionValue">32px</span>
+                        </div>
+                        <div class="control-group">
+                            <label>Pixel Size:</label>
+                            <input type="range" id="zoomSlider" min="4" max="32" value="12">
+                            <span id="zoomValue">12px</span>
+                        </div>
+                        <button class="btn" id="toggleGrid">Toggle Grid</button>
+                        <button class="btn" id="toggleValues">Toggle RGB Values</button>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+                        📊 Downsampled to: <span id="resolutionDisplay" style="color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;">--</span>
+                    </p>
+                    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;">
+                        <div style="flex: 0 0 auto;">
+                            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Original</p>
+                            <div style="background: var(--bg-dark); border-radius: 8px; padding: 0.5rem; border: 1px solid var(--border);">
+                                <img id="pixelOriginalThumb" style="max-width: 150px; max-height: 150px; border-radius: 4px; display: block;" alt="Original">
+                            </div>
+                        </div>
+                        <div style="flex: 1; min-width: 300px;">
+                            <p style="color: var(--text-secondary); font-size: 0.75rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Pixelated View (hover to inspect)</p>
+                            <div class="pixel-canvas-container">
+                                <canvas id="pixelCanvas"></canvas>
+                                <div class="pixel-info" id="pixelInfo">
+                                    <div class="pixel-color-box" id="pixelColorBox"></div>
+                                    <div class="pixel-coords" id="pixelCoords">X: 0, Y: 0</div>
+                                    <div class="pixel-rgb" id="pixelRGB">R: 0 G: 0 B: 0</div>
+                                    <div class="pixel-hex" id="pixelHex">#000000</div>
+                                    <div class="pixel-binary" id="pixelBinary">Binary: 00000000 00000000 00000000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="encoding-explanation">
+                        <h4>💡 How Pixels Store Color</h4>
+                        <p>Each pixel uses 3 numbers (0-255) for <code style="color: #ff6b6b;">Red</code>, <code style="color: #69db7c;">Green</code>, and <code style="color: #74c0fc;">Blue</code>. Mixing these creates all colors! <code>R:255 G:0 B:0</code> = pure red. <code>R:255 G:255 B:255</code> = white. That's 256 × 256 × 256 = <strong>16.7 million</strong> possible colors!</p>
+                        <p style="margin-top: 0.5rem;">🔍 <strong>What you see above:</strong> The entire image downsampled to a tiny grid. Lower resolution = fewer pixels = you can see each one! This is exactly how computer vision models "see" images.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let originalImage = null;
+        let imageData = null;
+        let showGrid = true;
+        let showValues = false;
+        let zoomLevel = 12;
+        let fileBytes = null;
+
+        // DOM Elements
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const explorerGrid = document.getElementById('explorerGrid');
+        const metadataGrid = document.getElementById('metadataGrid');
+        const binaryContainer = document.getElementById('binaryContainer');
+        const originalPreview = document.getElementById('originalPreview');
+        const resizedPreview = document.getElementById('resizedPreview');
+        const pixelCanvas = document.getElementById('pixelCanvas');
+        const pixelInfo = document.getElementById('pixelInfo');
+        const scaleSlider = document.getElementById('scaleSlider');
+        const zoomSlider = document.getElementById('zoomSlider');
+
+        // Upload handling
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                processImage(file);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) processImage(file);
+        });
+
+        // Process uploaded image
+        function processImage(file) {
+            // Read as ArrayBuffer for binary display
+            const binaryReader = new FileReader();
+            binaryReader.onload = (e) => {
+                fileBytes = new Uint8Array(e.target.result);
+                displayBinaryData();
+            };
+            binaryReader.readAsArrayBuffer(file);
+
+            // Read as Data URL for image display
+            const imageReader = new FileReader();
+            imageReader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    displayMetadata(file, img);
+                    displayPreviews(img);
+                    displayPixelExplorer(img);
+                    explorerGrid.classList.add('active');
+                    uploadZone.style.display = 'none';
+                };
+                img.src = e.target.result;
+            };
+            imageReader.readAsDataURL(file);
+        }
+
+        // Display file metadata
+        function displayMetadata(file, img) {
+            const metadata = [
+                { label: 'File Name', value: file.name },
+                { label: 'File Type', value: file.type },
+                { label: 'File Size', value: formatBytes(file.size) },
+                { label: 'Dimensions', value: `${img.width} × ${img.height} px` },
+                { label: 'Total Pixels', value: (img.width * img.height).toLocaleString() },
+                { label: 'Color Depth', value: '24-bit (8 bits × 3 channels)' },
+                { label: 'Raw Data Size', value: formatBytes(img.width * img.height * 3) },
+                { label: 'Compression', value: file.size < (img.width * img.height * 3) ? 
+                    `${((1 - file.size / (img.width * img.height * 3)) * 100).toFixed(1)}% smaller` : 'None' }
+            ];
+
+            metadataGrid.innerHTML = metadata.map(m => `
+                <div class="metadata-item">
+                    <div class="metadata-label">${m.label}</div>
+                    <div class="metadata-value">${m.value}</div>
+                </div>
+            `).join('');
+        }
+
+        // Format bytes to human readable
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' bytes';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        // Display binary data
+        function displayBinaryData() {
+            const rows = [];
+            const bytesToShow = Math.min(512, fileBytes.length);
+            
+            for (let i = 0; i < bytesToShow; i += 16) {
+                const offset = i.toString(16).padStart(8, '0').toUpperCase();
+                const hexBytes = [];
+                const asciiChars = [];
+                
+                for (let j = 0; j < 16 && i + j < bytesToShow; j++) {
+                    const byte = fileBytes[i + j];
+                    hexBytes.push(byte.toString(16).padStart(2, '0').toUpperCase());
+                    asciiChars.push(byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : '.');
+                }
+                
+                rows.push(`
+                    <div class="binary-row">
+                        <span class="binary-offset">${offset}</span>
+                        <span class="binary-hex">${hexBytes.join(' ')}</span>
+                        <span class="binary-ascii">${asciiChars.join('')}</span>
+                    </div>
+                `);
+            }
+            
+            binaryContainer.innerHTML = rows.join('');
+        }
+
+        // Display image previews
+        function displayPreviews(img) {
+            originalPreview.src = img.src;
+            document.getElementById('originalSize').textContent = `${img.width} × ${img.height}`;
+            updateResizedPreview();
+        }
+
+        function updateResizedPreview() {
+            const scale = scaleSlider.value / 100;
+            const newWidth = Math.floor(originalImage.width * scale);
+            const newHeight = Math.floor(originalImage.height * scale);
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(originalImage, 0, 0, newWidth, newHeight);
+            
+            resizedPreview.src = canvas.toDataURL();
+            document.getElementById('resizedSize').textContent = `${newWidth} × ${newHeight}`;
+            document.getElementById('scaleValue').textContent = `${scaleSlider.value}%`;
+        }
+
+        scaleSlider.addEventListener('input', updateResizedPreview);
+
+        // Pixel Explorer
+        let pixelResolution = 32; // Default resolution for pixel grid
+
+        function displayPixelExplorer(img) {
+            // Set the thumbnail
+            document.getElementById('pixelOriginalThumb').src = img.src;
+            updatePixelCanvas();
+        }
+
+        function updatePixelCanvas() {
+            if (!originalImage) return;
+            
+            const ctx = pixelCanvas.getContext('2d');
+            
+            // Calculate dimensions maintaining aspect ratio
+            const aspectRatio = originalImage.width / originalImage.height;
+            let pixelWidth, pixelHeight;
+            
+            if (aspectRatio >= 1) {
+                // Landscape or square
+                pixelWidth = pixelResolution;
+                pixelHeight = Math.max(1, Math.round(pixelResolution / aspectRatio));
+            } else {
+                // Portrait
+                pixelHeight = pixelResolution;
+                pixelWidth = Math.max(1, Math.round(pixelResolution * aspectRatio));
+            }
+            
+            // Downsample the ENTIRE image to low resolution
+            const sourceCanvas = document.createElement('canvas');
+            sourceCanvas.width = pixelWidth;
+            sourceCanvas.height = pixelHeight;
+            const sourceCtx = sourceCanvas.getContext('2d');
+            
+            // Draw entire image scaled down
+            sourceCtx.drawImage(originalImage, 0, 0, pixelWidth, pixelHeight);
+            imageData = sourceCtx.getImageData(0, 0, pixelWidth, pixelHeight);
+            
+            // Store dimensions for hover calculations
+            pixelCanvas.dataset.pixelWidth = pixelWidth;
+            pixelCanvas.dataset.pixelHeight = pixelHeight;
+            
+            // Draw zoomed pixels
+            const canvasWidth = pixelWidth * zoomLevel;
+            const canvasHeight = pixelHeight * zoomLevel;
+            pixelCanvas.width = canvasWidth;
+            pixelCanvas.height = canvasHeight;
+            
+            ctx.imageSmoothingEnabled = false;
+            
+            for (let y = 0; y < pixelHeight; y++) {
+                for (let x = 0; x < pixelWidth; x++) {
+                    const i = (y * pixelWidth + x) * 4;
+                    const r = imageData.data[i];
+                    const g = imageData.data[i + 1];
+                    const b = imageData.data[i + 2];
+                    
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.fillRect(x * zoomLevel, y * zoomLevel, zoomLevel, zoomLevel);
+                    
+                    // Draw grid
+                    if (showGrid && zoomLevel >= 6) {
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                        ctx.strokeRect(x * zoomLevel, y * zoomLevel, zoomLevel, zoomLevel);
+                    }
+                    
+                    // Draw RGB values
+                    if (showValues && zoomLevel >= 18) {
+                        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                        ctx.fillStyle = brightness > 128 ? '#000' : '#fff';
+                        ctx.font = `bold ${Math.floor(zoomLevel / 4.5)}px JetBrains Mono`;
+                        ctx.textAlign = 'center';
+                        ctx.fillText(`${r}`, x * zoomLevel + zoomLevel/2, y * zoomLevel + zoomLevel/3 + 2);
+                        ctx.fillText(`${g}`, x * zoomLevel + zoomLevel/2, y * zoomLevel + zoomLevel/2 + 2);
+                        ctx.fillText(`${b}`, x * zoomLevel + zoomLevel/2, y * zoomLevel + zoomLevel * 0.75 + 2);
+                    }
+                }
+            }
+            
+            // Update resolution display
+            const resDisplay = document.getElementById('resolutionDisplay');
+            if (resDisplay) {
+                resDisplay.textContent = `${pixelWidth} × ${pixelHeight} pixels (${(pixelWidth * pixelHeight).toLocaleString()} total)`;
+            }
+        }
+
+        // Zoom slider
+        zoomSlider.addEventListener('input', () => {
+            zoomLevel = parseInt(zoomSlider.value);
+            document.getElementById('zoomValue').textContent = `${zoomLevel}px`;
+            updatePixelCanvas();
+        });
+
+        // Resolution slider
+        document.getElementById('resolutionSlider').addEventListener('input', (e) => {
+            pixelResolution = parseInt(e.target.value);
+            document.getElementById('resolutionValue').textContent = `${pixelResolution}px`;
+            updatePixelCanvas();
+        });
+
+        // Toggle buttons
+        document.getElementById('toggleGrid').addEventListener('click', (e) => {
+            showGrid = !showGrid;
+            e.target.classList.toggle('active');
+            updatePixelCanvas();
+        });
+
+        document.getElementById('toggleValues').addEventListener('click', (e) => {
+            showValues = !showValues;
+            e.target.classList.toggle('active');
+            updatePixelCanvas();
+        });
+
+        // Pixel info on hover
+        pixelCanvas.addEventListener('mousemove', (e) => {
+            if (!imageData) return;
+            
+            const rect = pixelCanvas.getBoundingClientRect();
+            const pixelWidth = parseInt(pixelCanvas.dataset.pixelWidth) || pixelResolution;
+            const pixelHeight = parseInt(pixelCanvas.dataset.pixelHeight) || pixelResolution;
+            
+            const x = Math.floor((e.clientX - rect.left) / zoomLevel);
+            const y = Math.floor((e.clientY - rect.top) / zoomLevel);
+            
+            if (x < 0 || y < 0 || x >= pixelWidth || y >= pixelHeight) {
+                pixelInfo.classList.remove('visible');
+                return;
+            }
+            
+            const i = (y * pixelWidth + x) * 4;
+            const r = imageData.data[i];
+            const g = imageData.data[i + 1];
+            const b = imageData.data[i + 2];
+            
+            const hex = '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+            
+            document.getElementById('pixelColorBox').style.background = hex;
+            document.getElementById('pixelCoords').textContent = `X: ${x}, Y: ${y}`;
+            document.getElementById('pixelRGB').textContent = `R: ${r} G: ${g} B: ${b}`;
+            document.getElementById('pixelHex').textContent = hex;
+            document.getElementById('pixelBinary').textContent = 
+                `Binary: ${r.toString(2).padStart(8, '0')} ${g.toString(2).padStart(8, '0')} ${b.toString(2).padStart(8, '0')}`;
+            
+            // Position tooltip, keeping it within viewport
+            let tooltipX = e.clientX - rect.left + 20;
+            let tooltipY = e.clientY - rect.top + 20;
+            
+            // Adjust if tooltip would go off the right edge
+            if (tooltipX + 150 > rect.width) {
+                tooltipX = e.clientX - rect.left - 170;
+            }
+            
+            pixelInfo.style.left = tooltipX + 'px';
+            pixelInfo.style.top = tooltipY + 'px';
+            pixelInfo.classList.add('visible');
+        });
+
+        pixelCanvas.addEventListener('mouseleave', () => {
+            pixelInfo.classList.remove('visible');
+        });
+
+        // Initial toggle state
+        document.getElementById('toggleGrid').classList.add('active');
+    </script>
+</body>
+</html>
