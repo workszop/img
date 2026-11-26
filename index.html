@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=202611260814">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=202611260814">
     <meta name="theme-color" content="#FFD500">
-    <title>Image Anatomy Explorer · edulab</title>
+    <title>Anatomia obrazu · edulab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
@@ -230,14 +230,29 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         .ic { width: 18px; height: 18px; display: block; }
 
         /* ---- Top menu (no clickable control, so it scrolls away) ---- */
-        .edu-header { position: static; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); }
+        .edu-header { position: sticky; top: 0; z-index: 50; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); }
+        .edu-header-inner .edu-app-title { margin-right: auto; }
+        .btn-upload { display: inline-flex; align-items: center; gap: 8px; flex: none; border: none; cursor: pointer;
+            background: var(--yellow); color: var(--yellow-ink); padding: 10px 18px; border-radius: var(--r-pill);
+            font-family: var(--font-display); font-weight: 600; font-size: 15px; transition: background-color .15s; }
+        .btn-upload:hover { background: var(--yellow-600); }
+        .btn-upload .ic { width: 18px; height: 18px; }
+        .edu-seg { flex: none; display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); }
+        .edu-seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--r-pill); cursor: pointer;
+            font-family: var(--font-sans); font-weight: 600; font-size: 14px; color: var(--ink-2); }
+        .edu-seg button:hover { color: var(--ink); }
+        .edu-seg button[aria-pressed="true"] { background: var(--yellow); color: var(--yellow-ink); }
         .edu-header-inner { padding: 8px var(--gutter); display: flex; align-items: center; gap: 12px; }
         .edu-logo { width: 64px; height: 64px; display: block; margin-right: -6px; }
         .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; color: var(--ink); }
         .edu-app-title { margin: 0 0 0 14px; padding-left: 14px; border-left: 1px solid var(--line-2);
             font-family: var(--font-display); font-weight: 600; font-size: 38px; letter-spacing: -.02em; line-height: 1.1;
             color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
-        @media (max-width: 642px) { .edu-app-title { font-size: 30px; } } /* 38px truncates just above the phone breakpoint */
+        /* Title steps: the upload button and PL/EN share the bar (checked in PL and EN) */
+        @media (min-width: 641px) and (max-width: 959px) { .edu-app-title { font-size: 30px; } }
+        @media (min-width: 641px) and (max-width: 859px) { .edu-app-title { font-size: 24px; } }
+        @media (max-width: 859px) { .btn-upload { padding: 10px 12px; } .btn-upload .lbl { display: none; } }   /* icon only where the bar is tight; the button keeps its aria-label */
+        @media (min-width: 641px) and (max-width: 719px) { .edu-app-title { font-size: 19px; } }
 
         /* ---- Page head: lead + rule ---- */
         .page-head { padding: 28px var(--gutter) 30px; border-bottom: 1px solid var(--line-2); }
@@ -383,6 +398,10 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             .edu-header-inner { padding-top: 6px; padding-bottom: 6px; }
             .edu-logo { width: 48px; height: 48px; }
             .edu-app-title { font-size: 15px; margin-left: 10px; padding-left: 10px; }
+            .edu-header-inner { gap: 8px; }
+            .btn-upload { padding: 10px 12px; }
+            .btn-upload .lbl { display: none; }   /* icon only on phones; the button keeps its aria-label */
+            .edu-seg button { padding: 7px 11px; }
             .page-head { padding: 20px var(--gutter) 22px; }
             .sec { padding: 24px var(--gutter) 48px; }
             .card-body { padding: 16px; }
@@ -398,20 +417,25 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         <div class="edu-header-inner">
             <img class="edu-logo" alt="edulab" src="data:image/png;base64,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">
             <span class="edu-wordmark">edulab</span>
-            <h1 class="edu-app-title">Image Anatomy Explorer</h1>
+            <h1 class="edu-app-title" data-i18n="appTitle">Anatomia obrazu</h1>
+            <button type="button" class="btn-upload" id="uploadBtn" data-i18n-aria="upload" aria-label="Wgraj obraz"><i data-lucide="upload" class="ic" aria-hidden="true"></i><span class="lbl" data-i18n="upload">Wgraj obraz</span></button>
+            <div class="edu-seg" role="group" id="langSeg" data-i18n-aria="langLabel" aria-label="Język">
+                <button type="button" data-lang="pl" lang="pl" aria-pressed="true">PL</button>
+                <button type="button" data-lang="en" lang="en" aria-pressed="false">EN</button>
+            </div>
         </div>
     </header>
 
     <main>
         <header class="page-head">
-            <p class="edu-lead">See what's <strong>really</strong> inside your images – metadata, raw bytes, and pixel-by-pixel colour.</p>
+            <p class="edu-lead" data-i18n-html="lead">See what's <strong>really</strong> inside your images – metadata, raw bytes, and pixel-by-pixel colour.</p>
         </header>
 
         <section class="sec" aria-label="Explorer">
-        <div class="upload-zone" id="uploadZone">
+        <div class="upload-zone" id="uploadZone" role="button" tabindex="0">
             <span class="badge badge-lg" aria-hidden="true"><i data-lucide="image-up" class="ic"></i></span>
-            <h3>Drop an image here</h3>
-            <p>or click to browse (PNG, JPG, GIF, WebP)</p>
+            <h3 data-i18n="dropTitle">Drop an image here</h3>
+            <p data-i18n="dropHint">or click to browse (PNG, JPG, GIF, WebP)</p>
             <input type="file" id="fileInput" accept="image/*">
         </div>
         <p class="upload-status" id="uploadStatus" role="status" aria-live="polite"></p>
@@ -421,15 +445,15 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             <div class="card">
                 <div class="card-header">
                     <span class="badge" aria-hidden="true"><i data-lucide="file-text" class="ic"></i></span>
-                    <h2>File Metadata</h2>
+                    <h2 data-i18n="metaTitle">File Metadata</h2>
                 </div>
                 <div class="card-body">
                     <div class="metadata-grid" id="metadataGrid">
                         <!-- Populated by JS -->
                     </div>
                     <div class="encoding-explanation edu-block">
-                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>What is Metadata?</h4>
-                        <p>Metadata is "data about data" – information stored alongside your image like file name, size, and format. The computer uses this to know how to read the file!</p>
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i><span data-i18n="metaInfoH">What is Metadata?</span></h4>
+                        <p data-i18n-html="metaInfo"></p>
                     </div>
                 </div>
             </div>
@@ -438,29 +462,29 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             <div class="card">
                 <div class="card-header">
                     <span class="badge" aria-hidden="true"><i data-lucide="scaling" class="ic"></i></span>
-                    <h2>Size Comparison</h2>
+                    <h2 data-i18n="sizeTitle">Size Comparison</h2>
                 </div>
                 <div class="card-body">
                     <div class="controls">
                         <div class="control-group">
-                            <label for="scaleSlider">Scale:</label>
+                            <label for="scaleSlider" data-i18n="scale">Scale:</label>
                             <input type="range" id="scaleSlider" min="10" max="100" value="50">
                             <output id="scaleValue" for="scaleSlider">50%</output>
                         </div>
                     </div>
                     <div class="preview-row">
                         <div class="image-preview-container">
-                            <span class="size-badge" id="originalSize">Original</span>
-                            <img id="originalPreview" class="preview-image" alt="Original">
+                            <span class="size-badge" id="originalSize" data-i18n="original">Original</span>
+                            <img id="originalPreview" class="preview-image" alt="Original" data-i18n-alt="original">
                         </div>
                         <div class="image-preview-container">
-                            <span class="size-badge" id="resizedSize">Resized</span>
-                            <img id="resizedPreview" class="preview-image" alt="Resized">
+                            <span class="size-badge" id="resizedSize" data-i18n="resized">Resized</span>
+                            <img id="resizedPreview" class="preview-image" alt="Resized" data-i18n-alt="resized">
                         </div>
                     </div>
                     <div class="encoding-explanation edu-block">
-                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>How Resizing Works</h4>
-                        <p>When you shrink an image, the computer must decide which pixels to keep. This is called <code>downsampling</code>. Making images smaller reduces file size but loses detail!</p>
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i><span data-i18n="resizeInfoH">How Resizing Works</span></h4>
+                        <p data-i18n-html="resizeInfo"></p>
                     </div>
                 </div>
             </div>
@@ -469,7 +493,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             <div class="card full-width">
                 <div class="card-header">
                     <span class="badge" aria-hidden="true"><i data-lucide="binary" class="ic"></i></span>
-                    <h2>Raw Binary Data (First 512 bytes)</h2>
+                    <h2 data-i18n="binTitle">Raw Binary Data (First 512 bytes)</h2>
                 </div>
                 <div class="card-body">
                     <div class="binary-container" id="binaryContainer">
@@ -478,20 +502,20 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
                     <div class="legend">
                         <div class="legend-item">
                             <span class="legend-chip binary-offset" aria-hidden="true">0000</span>
-                            <span>Offset (position in file)</span>
+                            <span data-i18n="legOffset">Offset (position in file)</span>
                         </div>
                         <div class="legend-item">
                             <span class="legend-chip binary-hex" aria-hidden="true">FF D8</span>
-                            <span>Hexadecimal bytes</span>
+                            <span data-i18n="legHex">Hexadecimal bytes</span>
                         </div>
                         <div class="legend-item">
                             <span class="legend-chip binary-ascii" aria-hidden="true">JFIF</span>
-                            <span>ASCII representation</span>
+                            <span data-i18n="legAscii">ASCII representation</span>
                         </div>
                     </div>
                     <div class="encoding-explanation edu-block">
-                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>What is Binary Data?</h4>
-                        <p>Computers store everything as numbers. Each <code>byte</code> (8 bits) can hold a value from 0-255. Here we show bytes in <code>hexadecimal</code> (base-16) because it's more compact: <code>FF</code> = 255, <code>00</code> = 0. The first bytes often contain the file's "magic number" – a signature that identifies the file type!</p>
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i><span data-i18n="binInfoH">What is Binary Data?</span></h4>
+                        <p data-i18n-html="binInfo"></p>
                     </div>
                 </div>
             </div>
@@ -500,35 +524,35 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             <div class="card full-width">
                 <div class="card-header">
                     <span class="badge" aria-hidden="true"><i data-lucide="palette" class="ic"></i></span>
-                    <h2>Pixel Explorer</h2>
+                    <h2 data-i18n="pixTitle">Pixel Explorer</h2>
                 </div>
                 <div class="card-body pixel-explorer">
                     <div class="controls">
                         <div class="control-group">
-                            <label for="resolutionSlider">Resolution:</label>
+                            <label for="resolutionSlider" data-i18n="resolution">Resolution:</label>
                             <input type="range" id="resolutionSlider" min="8" max="64" value="32">
                             <output id="resolutionValue" for="resolutionSlider">32px</output>
                         </div>
                         <div class="control-group">
-                            <label for="zoomSlider">Pixel Size:</label>
+                            <label for="zoomSlider" data-i18n="pixelSize">Pixel Size:</label>
                             <input type="range" id="zoomSlider" min="4" max="32" value="12">
                             <output id="zoomValue" for="zoomSlider">12px</output>
                         </div>
-                        <button class="btn" id="toggleGrid" type="button">Toggle Grid</button>
-                        <button class="btn" id="toggleValues" type="button">Toggle RGB Values</button>
+                        <button class="btn" id="toggleGrid" type="button" aria-pressed="true" data-i18n="toggleGrid">Toggle Grid</button>
+                        <button class="btn" id="toggleValues" type="button" aria-pressed="false" data-i18n="toggleValues">Toggle RGB Values</button>
                     </div>
                     <p class="resolution-note">
-                        Downsampled to: <output id="resolutionDisplay">--</output>
+                        <span data-i18n="downsampled">Downsampled to:</span> <output id="resolutionDisplay">--</output>
                     </p>
                     <div class="pixel-layout">
                         <div class="pixel-thumb-col">
-                            <p class="field-label">Original</p>
+                            <p class="field-label" data-i18n="original">Original</p>
                             <div class="thumb-well">
-                                <img id="pixelOriginalThumb" alt="Original">
+                                <img id="pixelOriginalThumb" alt="Original" data-i18n-alt="original">
                             </div>
                         </div>
                         <div class="pixel-canvas-col">
-                            <p class="field-label">Pixelated View (hover to inspect)</p>
+                            <p class="field-label" data-i18n="pixView">Pixelated View (hover to inspect)</p>
                             <div class="pixel-canvas-container">
                                 <canvas id="pixelCanvas"></canvas>
                                 <div class="pixel-info" id="pixelInfo">
@@ -536,15 +560,15 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
                                     <div class="pixel-coords" id="pixelCoords">X: 0, Y: 0</div>
                                     <div class="pixel-rgb" id="pixelRGB">R: 0 G: 0 B: 0</div>
                                     <div class="pixel-hex" id="pixelHex">#000000</div>
-                                    <div class="pixel-binary" id="pixelBinary">Binary: 00000000 00000000 00000000</div>
+                                    <div class="pixel-binary" id="pixelBinary">00000000 00000000 00000000</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="encoding-explanation edu-block">
-                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>How Pixels Store Color</h4>
-                        <p>Each pixel uses 3 numbers (0-255) for <code>Red</code>, <code>Green</code>, and <code>Blue</code>. Mixing these creates all colors! <code>R:255 G:0 B:0</code> = pure red. <code>R:255 G:255 B:255</code> = white. That's 256 × 256 × 256 = <strong>16.7 million</strong> possible colors!</p>
-                        <p><strong>What you see above:</strong> The entire image downsampled to a tiny grid. Lower resolution = fewer pixels = you can see each one! This is exactly how computer vision models "see" images.</p>
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i><span data-i18n="pixInfoH">How Pixels Store Color</span></h4>
+                        <p data-i18n-html="pixInfo1"></p>
+                        <p data-i18n-html="pixInfo2"></p>
                     </div>
                 </div>
             </div>
@@ -561,6 +585,139 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         let zoomLevel = 12;
         let fileBytes = null;
 
+        // ─── Strings (Polish first, English second) ───
+        const T = {
+          pl: {
+            docTitle: 'Anatomia obrazu · edulab',
+            appTitle: 'Anatomia obrazu',
+            upload: 'Wgraj obraz',
+            langLabel: 'Język',
+            lead: 'Zobacz, co jest w środku pliku z obrazem: metadane, surowe bajty i kolor każdego piksela.',
+            dropTitle: 'Upuść tu obraz',
+            dropHint: 'albo kliknij i wybierz plik (PNG, JPG, GIF, WebP)',
+            metaTitle: 'Metadane pliku',
+            metaInfoH: 'Do czego służą metadane',
+            metaInfo: 'Metadane to „dane o danych”, zapisane razem z obrazem: nazwa pliku, rozmiar, format. Z nich komputer wie, jak odczytać plik.',
+            sizeTitle: 'Porównanie rozmiarów',
+            scale: 'Skala:',
+            original: 'Oryginał',
+            resized: 'Po zmniejszeniu',
+            resizeInfoH: 'Zmniejszanie obrazu',
+            resizeInfo: 'Przy zmniejszaniu obrazu komputer decyduje, które piksele zachować. Nazywa się to <code>downsampling</code>. Mniejszy obraz zajmuje mniej miejsca, ale traci szczegóły.',
+            binTitle: 'Surowe dane binarne (pierwsze 512 bajtów)',
+            legOffset: 'Offset (pozycja w pliku)',
+            legHex: 'Bajty w zapisie szesnastkowym',
+            legAscii: 'Te same bajty jako znaki ASCII',
+            binInfoH: 'Dane binarne',
+            binInfo: 'Komputer zapisuje wszystko jako liczby. Jeden <code>bajt</code> (8 bitów) mieści wartość od 0 do 255. Bajty pokazujemy w zapisie <code>szesnastkowym</code> (o podstawie 16), bo jest krótszy: <code>FF</code> = 255, <code>00</code> = 0. Na początku pliku często stoi jego „magiczna liczba”, czyli podpis, po którym rozpoznaje się typ pliku.',
+            pixTitle: 'Piksele z bliska',
+            resolution: 'Rozdzielczość:',
+            pixelSize: 'Rozmiar piksela:',
+            toggleGrid: 'Siatka',
+            toggleValues: 'Wartości RGB',
+            downsampled: 'Zmniejszono do:',
+            pixView: 'Widok pikseli (najedź kursorem, żeby sprawdzić piksel)',
+            pixInfoH: 'Kolor piksela',
+            pixInfo1: 'Każdy piksel to 3 liczby od 0 do 255: <code>czerwony</code>, <code>zielony</code> i <code>niebieski</code>. Mieszając je, dostajemy każdy kolor. <code>R:255 G:0 B:0</code> to czysta czerwień, <code>R:255 G:255 B:255</code> to biel. Razem daje to 256 × 256 × 256 = <strong>16,7 miliona</strong> kolorów.',
+            pixInfo2: '<strong>Co widać wyżej:</strong> cały obraz zmniejszony do małej siatki. Im niższa rozdzielczość, tym mniej pikseli i tym łatwiej zobaczyć każdy z osobna. Tak właśnie „widzą” obrazy modele widzenia komputerowego.',
+            mFileName: 'Nazwa pliku', mFileType: 'Typ pliku', mFileSize: 'Rozmiar pliku', mDims: 'Wymiary',
+            mPixels: 'Liczba pikseli', mDepth: 'Głębia koloru', mDepthVal: '24 bity (8 bitów × 3 kanały)',
+            mRaw: 'Surowe dane', mCompr: 'Kompresja', comprNone: 'brak',
+            comprSmaller: (p) => `${p}% mniej`,
+            bytesUnit: 'B',
+            resDisplay: (w, h, total) => `${w} × ${h} pikseli (razem ${total})`,
+            binary: 'Binarnie',
+            unknownType: 'nieznany',
+            notImage: (name, type) => `„${name}” to nie obraz (typ: ${type}). Wybierz plik PNG, JPG, GIF albo WebP.`,
+            tooBig: (size, max) => `Plik ma ${size}, a aplikacja przyjmuje najwyżej ${max}.`,
+            loading: (name) => `Wczytuję ${name}…`,
+            readFail: 'Nie udało się odczytać pliku. Mógł zostać przeniesiony albo usunięty.',
+            tooManyPx: (w, h, mp, max) => `Obraz ma ${w} × ${h} px (${mp} MP), a aplikacja przyjmuje najwyżej ${max} MP.`,
+            decodeFail: (name) => `Nie udało się otworzyć „${name}”: plik jest uszkodzony albo ma nieobsługiwany format.`,
+            locale: 'pl-PL',
+          },
+          en: {
+            docTitle: 'Image Anatomy Explorer · edulab',
+            appTitle: 'Image Anatomy Explorer',
+            upload: 'Upload image',
+            langLabel: 'Language',
+            lead: 'See what\'s <strong>really</strong> inside your images – metadata, raw bytes, and pixel-by-pixel colour.',
+            dropTitle: 'Drop an image here',
+            dropHint: 'or click to browse (PNG, JPG, GIF, WebP)',
+            metaTitle: 'File Metadata',
+            metaInfoH: 'What is Metadata?',
+            metaInfo: 'Metadata is "data about data" – information stored alongside your image like file name, size, and format. The computer uses this to know how to read the file!',
+            sizeTitle: 'Size Comparison',
+            scale: 'Scale:',
+            original: 'Original',
+            resized: 'Resized',
+            resizeInfoH: 'How Resizing Works',
+            resizeInfo: 'When you shrink an image, the computer must decide which pixels to keep. This is called <code>downsampling</code>. Making images smaller reduces file size but loses detail!',
+            binTitle: 'Raw Binary Data (First 512 bytes)',
+            legOffset: 'Offset (position in file)',
+            legHex: 'Hexadecimal bytes',
+            legAscii: 'ASCII representation',
+            binInfoH: 'What is Binary Data?',
+            binInfo: 'Computers store everything as numbers. Each <code>byte</code> (8 bits) can hold a value from 0-255. Here we show bytes in <code>hexadecimal</code> (base-16) because it\'s more compact: <code>FF</code> = 255, <code>00</code> = 0. The first bytes often contain the file\'s "magic number" – a signature that identifies the file type!',
+            pixTitle: 'Pixel Explorer',
+            resolution: 'Resolution:',
+            pixelSize: 'Pixel Size:',
+            toggleGrid: 'Toggle Grid',
+            toggleValues: 'Toggle RGB Values',
+            downsampled: 'Downsampled to:',
+            pixView: 'Pixelated View (hover to inspect)',
+            pixInfoH: 'How Pixels Store Color',
+            pixInfo1: 'Each pixel uses 3 numbers (0-255) for <code>Red</code>, <code>Green</code>, and <code>Blue</code>. Mixing these creates all colors! <code>R:255 G:0 B:0</code> = pure red. <code>R:255 G:255 B:255</code> = white. That\'s 256 × 256 × 256 = <strong>16.7 million</strong> possible colors!',
+            pixInfo2: '<strong>What you see above:</strong> The entire image downsampled to a tiny grid. Lower resolution = fewer pixels = you can see each one! This is exactly how computer vision models "see" images.',
+            mFileName: 'File Name', mFileType: 'File Type', mFileSize: 'File Size', mDims: 'Dimensions',
+            mPixels: 'Total Pixels', mDepth: 'Color Depth', mDepthVal: '24-bit (8 bits × 3 channels)',
+            mRaw: 'Raw Data Size', mCompr: 'Compression', comprNone: 'None',
+            comprSmaller: (p) => `${p}% smaller`,
+            bytesUnit: 'bytes',
+            resDisplay: (w, h, total) => `${w} × ${h} pixels (${total} total)`,
+            binary: 'Binary',
+            unknownType: 'unknown',
+            notImage: (name, type) => `"${name}" is not an image (type: ${type}). Try PNG, JPG, GIF, or WebP.`,
+            tooBig: (size, max) => `File is ${size} – the explorer handles up to ${max}.`,
+            loading: (name) => `Loading ${name}…`,
+            readFail: 'Could not read the file. It may have been moved or deleted.',
+            tooManyPx: (w, h, mp, max) => `Image is ${w} × ${h} px (${mp} MP) – the explorer handles up to ${max} MP.`,
+            decodeFail: (name) => `Could not decode "${name}" – the file is corrupt or not a supported image format.`,
+            locale: 'en-GB',
+          },
+        };
+
+        // ─── Language ───
+        const LANG_KEY = 'imgAnatomy.lang';
+        let lang = (() => { try { const v = localStorage.getItem(LANG_KEY); return v === 'en' ? 'en' : 'pl'; } catch { return 'pl'; } })();
+        let lastFile = null;
+        let lastStatus = null;   // { key, args, isError } so a language switch can re-render it
+        const t = (key, ...args) => { const v = (T[lang] && T[lang][key]) ?? T.en[key]; return typeof v === 'function' ? v(...args) : v; };
+        const num = (n, digits) => Number(n).toLocaleString(t('locale'), digits === undefined ? {} : { minimumFractionDigits: digits, maximumFractionDigits: digits });
+
+        function applyLanguage() {
+            document.documentElement.lang = lang;
+            document.title = t('docTitle');
+            document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+            document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });   // constant strings from T only
+            document.querySelectorAll('[data-i18n-alt]').forEach(el => { el.alt = t(el.dataset.i18nAlt); });
+            document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+            document.querySelectorAll('#langSeg [data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+            if (originalImage && lastFile) {
+                displayMetadata(lastFile, originalImage);
+                document.getElementById('originalSize').textContent = `${originalImage.width} × ${originalImage.height}`;
+                updateResizedPreview();
+                updatePixelCanvas();
+            }
+            if (lastStatus) showStatus(lastStatus.key, lastStatus.isError, ...lastStatus.args);
+        }
+        function setLanguage(next) {
+            if (next !== 'pl' && next !== 'en') return;
+            lang = next;
+            try { localStorage.setItem(LANG_KEY, lang); } catch {}
+            applyLanguage();
+        }
+
         // DOM Elements
         const uploadZone = document.getElementById('uploadZone');
         const fileInput = document.getElementById('fileInput');
@@ -576,6 +733,11 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
         // Upload handling
         uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+        });
+        document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
+        document.querySelectorAll('#langSeg [data-lang]').forEach(b => b.addEventListener('click', () => setLanguage(b.dataset.lang)));
         uploadZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadZone.classList.add('dragover');
@@ -601,12 +763,13 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         let currentObjectUrl = null;
         const uploadStatus = document.getElementById('uploadStatus');
 
-        function showStatus(text, isError) {
-            uploadStatus.textContent = text;
+        function showStatus(key, isError, ...args) {
+            lastStatus = key ? { key, isError: !!isError, args } : null;
+            uploadStatus.textContent = key ? t(key, ...args) : '';
             uploadStatus.classList.toggle('error', !!isError);
         }
-        function failUpload(text, url) {
-            showStatus(text, true);
+        function failUpload(key, url, ...args) {
+            showStatus(key, true, ...args);
             fileInput.value = '';       // the same file can be picked again after a fix
             if (url) URL.revokeObjectURL(url);
         }
@@ -614,14 +777,14 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         // Process uploaded image
         function processImage(file) {
             if (!file.type.startsWith('image/')) {
-                failUpload(`"${file.name}" is not an image (type: ${file.type || 'unknown'}). Try PNG, JPG, GIF, or WebP.`);
+                failUpload('notImage', null, file.name, file.type || t('unknownType'));
                 return;
             }
             if (file.size > MAX_FILE_BYTES) {
-                failUpload(`File is ${formatBytes(file.size)} – the explorer handles up to ${formatBytes(MAX_FILE_BYTES)}.`);
+                failUpload('tooBig', null, formatBytes(file.size), formatBytes(MAX_FILE_BYTES));
                 return;
             }
-            showStatus(`Loading ${file.name}…`, false);
+            showStatus('loading', false, file.name);
 
             // The hex view only ever shows the first bytes – no need to read the whole file
             file.slice(0, BINARY_PREVIEW_BYTES).arrayBuffer()
@@ -629,27 +792,28 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
                     fileBytes = new Uint8Array(buf);
                     displayBinaryData();
                 })
-                .catch(() => failUpload('Could not read the file. It may have been moved or deleted.'));
+                .catch(() => failUpload('readFail'));
 
             const url = URL.createObjectURL(file);
             const img = new Image();
             img.onload = () => {
                 if (img.width * img.height > MAX_PIXELS) {
-                    failUpload(`Image is ${img.width} × ${img.height} px (${(img.width * img.height / 1e6).toFixed(1)} MP) – the explorer handles up to ${MAX_PIXELS / 1e6} MP.`, url);
+                    failUpload('tooManyPx', url, img.width, img.height, num(img.width * img.height / 1e6, 1), MAX_PIXELS / 1e6);
                     return;
                 }
                 if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
                 currentObjectUrl = url;
                 originalImage = img;
+                lastFile = file;
                 displayMetadata(file, img);
                 displayPreviews(img);
                 displayPixelExplorer(img);
                 explorerGrid.classList.add('active');
                 uploadZone.style.display = 'none';
-                showStatus('', false);
+                showStatus(null, false);
             };
             img.onerror = () => {
-                failUpload(`Could not decode "${file.name}" – the file is corrupt or not a supported image format.`, url);
+                failUpload('decodeFail', url, file.name);
             };
             img.src = url;
         }
@@ -657,15 +821,15 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         // Display file metadata
         function displayMetadata(file, img) {
             const metadata = [
-                { label: 'File Name', value: file.name },
-                { label: 'File Type', value: file.type },
-                { label: 'File Size', value: formatBytes(file.size) },
-                { label: 'Dimensions', value: `${img.width} × ${img.height} px` },
-                { label: 'Total Pixels', value: (img.width * img.height).toLocaleString() },
-                { label: 'Color Depth', value: '24-bit (8 bits × 3 channels)' },
-                { label: 'Raw Data Size', value: formatBytes(img.width * img.height * 3) },
-                { label: 'Compression', value: file.size < (img.width * img.height * 3) ?
-                    `${((1 - file.size / (img.width * img.height * 3)) * 100).toFixed(1)}% smaller` : 'None' }
+                { label: t('mFileName'), value: file.name },
+                { label: t('mFileType'), value: file.type },
+                { label: t('mFileSize'), value: formatBytes(file.size) },
+                { label: t('mDims'), value: `${img.width} × ${img.height} px` },
+                { label: t('mPixels'), value: num(img.width * img.height) },
+                { label: t('mDepth'), value: t('mDepthVal') },
+                { label: t('mRaw'), value: formatBytes(img.width * img.height * 3) },
+                { label: t('mCompr'), value: file.size < (img.width * img.height * 3) ?
+                    t('comprSmaller', num((1 - file.size / (img.width * img.height * 3)) * 100, 1)) : t('comprNone') }
             ];
 
             metadataGrid.textContent = '';
@@ -685,9 +849,9 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
         // Format bytes to human readable
         function formatBytes(bytes) {
-            if (bytes < 1024) return bytes + ' bytes';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            if (bytes < 1024) return bytes + ' ' + t('bytesUnit');
+            if (bytes < 1024 * 1024) return num(bytes / 1024, 2) + ' KB';
+            return num(bytes / (1024 * 1024), 2) + ' MB';
         }
 
         // Display binary data – built with textContent: the ASCII column is raw file bytes
@@ -825,7 +989,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             // Update resolution display
             const resDisplay = document.getElementById('resolutionDisplay');
             if (resDisplay) {
-                resDisplay.textContent = `${pixelWidth} × ${pixelHeight} pixels (${(pixelWidth * pixelHeight).toLocaleString()} total)`;
+                resDisplay.textContent = t('resDisplay', pixelWidth, pixelHeight, num(pixelWidth * pixelHeight));
             }
         }
 
@@ -846,13 +1010,15 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         // Toggle buttons
         document.getElementById('toggleGrid').addEventListener('click', (e) => {
             showGrid = !showGrid;
-            e.target.classList.toggle('active');
+            e.currentTarget.classList.toggle('active', showGrid);
+            e.currentTarget.setAttribute('aria-pressed', String(showGrid));
             updatePixelCanvas();
         });
 
         document.getElementById('toggleValues').addEventListener('click', (e) => {
             showValues = !showValues;
-            e.target.classList.toggle('active');
+            e.currentTarget.classList.toggle('active', showValues);
+            e.currentTarget.setAttribute('aria-pressed', String(showValues));
             updatePixelCanvas();
         });
 
@@ -884,7 +1050,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             document.getElementById('pixelRGB').textContent = `R: ${r} G: ${g} B: ${b}`;
             document.getElementById('pixelHex').textContent = hex;
             document.getElementById('pixelBinary').textContent =
-                `Binary: ${r.toString(2).padStart(8, '0')} ${g.toString(2).padStart(8, '0')} ${b.toString(2).padStart(8, '0')}`;
+                `${t('binary')}: ${r.toString(2).padStart(8, '0')} ${g.toString(2).padStart(8, '0')} ${b.toString(2).padStart(8, '0')}`;
 
             // Position tooltip, keeping it within viewport
             let tooltipX = e.clientX - rect.left + 20;
@@ -906,6 +1072,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
         // Initial toggle state
         document.getElementById('toggleGrid').classList.add('active');
+        applyLanguage();
 
         // Icons (Lucide loads deferred; the page works without it)
         window.addEventListener('DOMContentLoaded', () => { if (window.lucide) window.lucide.createIcons(); });
