@@ -3,657 +3,396 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=202611260814">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=202611260814">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=202611260814">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=202611260814">
+    <meta name="theme-color" content="#FFD500">
     <title>Image Anatomy Explorer · edulab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@1.57.0/dist/umd/lucide.min.js"
+      integrity="sha384-Qp5jsYqEgOGiWD8YMQ6yXIycASOePxr9mmbt+Ua0Wu1IScYxo0Pxf7o3Kx6NWJID"
+      crossorigin="anonymous" defer></script>
     <style>
+/* ============================================================
+   edulab - Colors & Type foundation
+   Fonts (Outfit, IBM Plex Sans, Roboto Mono) load from Google Fonts
+   via the <link> tags in tokens/head.html - paste that into <head>.
+   No @import here: it chains requests and blocks rendering.
+   ============================================================ */
+
+:root {
+  /* ---- Brand fonts ---- */
+  --font-display: 'Outfit', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-sans:    'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:    'Roboto Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ============================================================
+     RAW COLOR TOKENS
+     ============================================================ */
+
+  /* Paper - page background is white; the stone steps are bands / wells.
+     Warm neutral grey (no yellow cast) so yellow and the colour blocks stay the
+     loudest thing on the page. Stone v2 (2026-10-10) replaced the cream sand
+     (#FBF7E6 / #F5EDCB), which at 1.07:1 on white did not read as a surface. */
+  --paper:    #FFFFFF;   /* page background (white)                       */
+  --paper-2:  #F5F3F0;   /* stone band: alternating sections, card heads   */
+  --paper-3:  #EAE6E0;   /* deepest stone: wells, table heads, bar tracks  */
+  --surface:  #FFFFFF;   /* cards & sheets                                */
+
+  /* Ink - warm near-black text & lines */
+  --ink:      #1C1917;   /* primary text                                    */
+  --ink-2:    #44403C;   /* secondary text, 10.3:1 on white                 */
+  --ink-3:    #625B53;   /* muted / placeholder: >= 4.5:1 on every paper step */
+  --line:     #E0DBD3;   /* hairline: dividers, table rows, card heads      */
+  --line-2:   #C9C2B7;   /* stronger: card contours, section rules          */
+  --line-strong: #857C69;/* control boundaries (inputs, ghost buttons,
+                            answer options): >= 3:1 on paper steps (WCAG 1.4.11) */
+
+  /* ---- Brand: Yellow main · Blue + Green secondary · Red danger ----
+     Plain saturated colours. The base colour (--blue) is for large fills,
+     illustrations and large text (>= 24px, or 19px bold). "-soft" is the
+     solid fill for chips and panels that carry small text: it is the
+     AA shade (= "-600"), so its "-ink" (white; dark ink on yellow) reaches
+     4.5:1. A colour used AS text goes only on white and uses "-600".
+     Never colour-on-colour (no green text on green).
+     Gate: python3 scripts/check-contrast.py */
+
+  /* Yellow - primary (buttons, progress, values on dark panels) */
+  --yellow:      #FFD500;
+  --yellow-600:  #F0C800;  /* hover / press          */
+  --yellow-soft: #FFD500;  /* chip / panel fill      */
+  --yellow-ink:  #1C1917;  /* text on yellow         */
+
+  /* Blue - secondary (panels, chips, correct / selected state) */
+  --blue:      #1E8FC2;
+  --blue-600:  #177AA8;
+  --blue-soft: #177AA8;   /* = blue-600, white text 4.8:1 */
+  --blue-ink:  #FFFFFF;
+
+  /* Green - secondary support (chips, success) */
+  --green:      #00A651;
+  --green-600:  #078342;  /* hover / press, AA text shade */
+  --green-soft: #078342;  /* = green-600, white text 4.9:1 */
+  --green-ink:  #FFFFFF;
+
+  /* Red - danger / important / wrong (use sparingly) */
+  --red:      #E5322D;
+  --red-600:  #C92823;
+  --red-soft: #C92823;   /* = red-600, white text 5.5:1 */
+  --red-ink:  #FFFFFF;
+
+  /* Grape - 5th category tone (colour-coded groups), from the play palette */
+  --grape:      #7A5AC2;
+  --grape-soft: #7A5AC2;  /* white text 5.2:1 */
+  --grape-ink:  #FFFFFF;
+
+  /* Legacy role aliases - older edulab apps use these names */
+  --marigold: var(--yellow); --marigold-600: var(--yellow-600); --marigold-soft: var(--yellow-soft); --marigold-ink: var(--yellow-ink);
+  --teal:     var(--blue);   --teal-600:     var(--blue-600);   --teal-soft:     var(--blue-soft);   --teal-ink:     var(--blue-ink);
+  --sky:      var(--green);                                     --sky-soft:      var(--green-soft);  --sky-ink:      var(--green-ink);
+  --coral:    var(--red);    --coral-600:    var(--red-600);    --coral-soft:    var(--red-soft);    --coral-ink:    var(--red-ink);
+
+  /* Play palette - subject/category colours in the kids app */
+  --play-sun:    #FFD500;
+  --play-grass:  #00A651;
+  --play-berry:  #C6478B;
+  --play-grape:  #7A5AC2;
+  --play-sky:    #1E8FC2;
+  --play-coral:  #E5322D;
+
+  /* ---- Semantic ---- */
+  --success:      #00A651;  --success-soft: #078342;  --success-ink: #FFFFFF;
+  --warning:      #FFD500;  --warning-soft: #FFD500;  --warning-ink: #1C1917;
+  --danger:       #E5322D;  --danger-soft:  #C92823;  --danger-ink:  #FFFFFF;
+  --info:         #1E8FC2;  --info-soft:    #177AA8;  --info-ink:    #FFFFFF;
+
+  /* ---- Functional aliases ---- */
+  --bg:        var(--paper);
+  --fg:        var(--ink);
+  --fg-muted:  var(--ink-2);
+  --primary:   var(--yellow);
+  --on-primary:#1C1917;      /* dark text on yellow */
+  /* White gap + ink band: >= 3:1 on paper, sand, yellow and every chip fill.
+     Pair with `outline: 3px solid transparent` so forced-colours mode still shows focus. */
+  --focus-ring: 0 0 0 2px var(--paper), 0 0 0 5px var(--ink);
+  /* Range-slider track */
+  --track: color-mix(in srgb, var(--ink) 24%, transparent);
+
+  /* ============================================================
+     SPACING  (4pt base)
+     ============================================================ */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+  /* ---- Radii (friendly, generous) ---- */
+  /* Page gutter (user decision 2026-11-07): content ~70% of the viewport on wide screens
+     (15% margin each side from ~1280px), never squeezed below 900px, 16-72px on phones/tablets.
+     Every full-width band, header row, page head and footer pads its content with it. */
+  --gutter: max(clamp(16px, 4vw, 72px), min(15vw, calc((100vw - 900px) / 2)));
+  --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+
+  /* ---- Elevation - warm, low, soft ---- */
+  --shadow-sm: 0 1px 2px rgba(33,30,26,.10), 0 2px 6px rgba(33,30,26,.06);
+  --shadow-md: 0 6px 18px rgba(33,30,26,.12), 0 1px 3px rgba(33,30,26,.08);
+  --shadow-lg: 0 16px 40px rgba(33,30,26,.12), 0 3px 8px rgba(33,30,26,.06);
+  --shadow-primary:  0 8px 22px color-mix(in srgb, var(--yellow) 30%, transparent);
+  --shadow-marigold: var(--shadow-primary);   /* legacy alias */
+
+  /* ============================================================
+     TYPE SCALE (semantic sizes)
+     ============================================================ */
+  --display-font:  clamp(48px, 6vw, 72px);
+  --h1: 44px; --h2: 33px; --h3: 25px; --h4: 19px;
+  --body-lg: 18px; --body: 16px; --body-sm: 14px;
+  --caption: 13px; --overline: 12px;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES
+   Apply via element selectors or .edu-prose wrapper.
+   Element defaults are wrapped in :where(.edu) (zero specificity) so any
+   single class wins: <p class="edu-overline">, <p class="edu-small">,
+   <h1 class="app-title"> keep their own font/size instead of the element default.
+   ============================================================ */
+
+.edu-display, :where(.edu) h1.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--display-font);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+:where(.edu) h1, .edu-h1 {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: var(--h1);
+  line-height: 1.06; letter-spacing: -0.02em; color: var(--ink);
+}
+:where(.edu) h2, .edu-h2 {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: var(--h2);
+  line-height: 1.12; letter-spacing: -0.015em; color: var(--ink);
+}
+:where(.edu) h3, .edu-h3 {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: var(--h3);
+  line-height: 1.2; letter-spacing: -0.01em; color: var(--ink);
+}
+:where(.edu) h4, .edu-h4 {
+  font-family: var(--font-sans);
+  font-weight: 700; font-size: var(--h4);
+  line-height: 1.3; color: var(--ink);
+}
+:where(.edu) p, .edu-p, .edu-body {
+  font-family: var(--font-sans);
+  font-weight: 400; font-size: var(--body);
+  line-height: 1.6; color: var(--ink-2);
+}
+.edu-body-lg { font-family: var(--font-sans); font-size: var(--body-lg); line-height: 1.6; color: var(--ink-2); }
+.edu-small  { font-family: var(--font-sans); font-size: var(--body-sm); line-height: 1.5; color: var(--ink-2); }
+.edu-caption{ font-family: var(--font-sans); font-size: var(--caption); line-height: 1.45; color: var(--ink-3); }
+
+/* Overline - mono, tracked; functional labels only (never above page/section titles) */
+.edu-overline {
+  font-family: var(--font-mono);
+  font-weight: 500; font-size: var(--overline);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink);
+}
+:where(.edu) code, .edu-mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em; color: var(--ink);
+  background: var(--paper-3); padding: 0.12em 0.4em; border-radius: var(--r-xs);
+}
+
+/* Solid colour blocks (callouts, stat cards, chips): set background: var(--X-soft) and
+   color: var(--X-ink) on the block, add .edu-block, and every heading/paragraph inside
+   inherits that text colour instead of the default ink. */
+.edu-block, .edu-block h1, .edu-block h2, .edu-block h3, .edu-block h4, .edu-block p,
+.edu-block li, .edu-block small { color: inherit; }
+
+body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+
         /* ============================================================
-           edulab — Colors & Type foundation (design tokens)
+           App styles - built only from the edulab tokens above
            ============================================================ */
-        :root {
-            /* ---- Brand fonts ---- */
-            --font-display: 'Bricolage Grotesque', 'Hanken Grotesk', system-ui, sans-serif;
-            --font-sans:    'Hanken Grotesk', system-ui, -apple-system, sans-serif;
-            --font-mono:    'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+        body.edu { display: flex; flex-direction: column; }   /* the stone band fills the rest of the screen */
+        main { flex: 1; display: flex; flex-direction: column; }
+        .sec { flex: 1; }
+        :focus-visible { outline: 3px solid transparent; outline-offset: 2px; box-shadow: var(--focus-ring); }
+        button { font: inherit; }
+        .ic { width: 18px; height: 18px; display: block; }
 
-            /* Paper — warm cream backgrounds (never pure white) */
-            --paper:    #FBF7F0;
-            --paper-2:  #F4EDDF;
-            --paper-3:  #ECE1CF;
-            --surface:  #FFFFFF;
-
-            /* Ink — warm near-black text & lines */
-            --ink:      #211E1A;
-            --ink-2:    #5B554D;
-            --ink-3:    #938A7C;
-            --line:     #E7DCCB;
-            --line-2:   #D6C8B2;
-
-            /* Marigold — primary brand */
-            --marigold:      #E8920C;
-            --marigold-600:  #CE800A;
-            --marigold-soft: #FBE7C2;
-            --marigold-ink:  #8A4F00;
-
-            /* Teal — secondary brand */
-            --teal:      #0E8C7F;
-            --teal-600:  #0B7468;
-            --teal-soft: #D2EBE6;
-            --teal-ink:  #0A5A52;
-
-            /* Coral — accent (sparingly) */
-            --coral:      #EF5B3F;
-            --coral-600:  #D44A30;
-            --coral-soft: #FBDDD4;
-            --coral-ink:  #9A2E1B;
-
-            /* Sky — supportive */
-            --sky:      #2E78C9;
-            --sky-soft: #D9E7F6;
-            --sky-ink:  #1B4E88;
-
-            /* ---- Radii ---- */
-            --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
-
-            /* ---- Elevation — warm, low, soft ---- */
-            --shadow-sm: 0 1px 2px rgba(33,30,26,.06), 0 1px 1px rgba(33,30,26,.04);
-            --shadow-md: 0 4px 16px rgba(33,30,26,.08), 0 1px 3px rgba(33,30,26,.05);
-            --shadow-lg: 0 16px 40px rgba(33,30,26,.12), 0 3px 8px rgba(33,30,26,.06);
-            --shadow-marigold: 0 8px 22px rgba(232,146,12,.28);
-
-            --focus-ring: 0 0 0 3px rgba(232,146,12,.38);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-sans);
-            background: var(--paper);
-            color: var(--ink);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Subtle warm background grid */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image:
-                linear-gradient(rgba(33, 30, 26, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(33, 30, 26, 0.025) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* ============================================================
-           Branded top menu (shared edulab chrome)
-           ============================================================ */
-        .edu-header {                      /* edustyl bar: solid white, not sticky (no clickable control) */
-            position: static; width: 100%;
-            background: #FFFFFF;
-            border-bottom: 1px solid #C9C2B7;
-        }
-        .edu-header-inner {
-            max-width: 1100px; margin: 0 auto;
-            padding: 8px 30px; display: flex; align-items: center; gap: 12px;
-        }
+        /* ---- Top menu (no clickable control, so it scrolls away) ---- */
+        .edu-header { position: static; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); }
+        .edu-header-inner { padding: 8px var(--gutter); display: flex; align-items: center; gap: 12px; }
         .edu-logo { width: 64px; height: 64px; display: block; margin-right: -6px; }
-        .edu-wordmark {
-            font-family: 'Outfit', var(--font-display); font-weight: 700; font-size: 22px;
-            letter-spacing: -.02em; color: #1C1917;
-        }
-        .edu-app-title {
-            margin: 0 0 0 14px; padding-left: 14px; border-left: 1px solid #C9C2B7;
-            font-family: 'Outfit', var(--font-display); font-weight: 600; font-size: 19px; letter-spacing: -.01em; line-height: 1.2;
-            color: #44403C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto;
+        .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; color: var(--ink); }
+        .edu-app-title { margin: 0 0 0 14px; padding-left: 14px; border-left: 1px solid var(--line-2);
+            font-family: var(--font-display); font-weight: 600; font-size: 19px; letter-spacing: -.01em; line-height: 1.2;
+            color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+
+        /* ---- Page head: lead + rule ---- */
+        .page-head { padding: 28px var(--gutter) 30px; border-bottom: 1px solid var(--line-2); }
+        .edu-lead { font-family: var(--font-sans); font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); margin: 0; }
+        .edu-lead strong { color: var(--ink); font-weight: 600; }
+
+        /* ---- Stone band holding the workbench ---- */
+        .sec { background: var(--paper-2); padding: 36px var(--gutter) 64px; }
+
+        /* ---- Badges (Lucide icon in a solid rounded square) ---- */
+        .badge { flex: 0 0 auto; width: 34px; height: 34px; border-radius: var(--r-sm); display: grid; place-items: center;
+            background: var(--ink); color: var(--yellow); }
+        .badge .ic { width: 18px; height: 18px; }
+        .badge-lg { width: 56px; height: 56px; border-radius: var(--r-md); background: var(--yellow); color: var(--yellow-ink); }
+        .badge-lg .ic { width: 28px; height: 28px; }
+
+        /* ---- Upload zone ---- */
+        .upload-zone { border: 2px dashed var(--line-strong); border-radius: var(--r-xl); padding: 3rem 1.5rem;
+            text-align: center; background: var(--surface); cursor: pointer; transition: border-color .2s, background-color .2s; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--ink); background: var(--paper-3); }
+        .upload-zone .badge-lg { margin: 0 auto 1rem; }
+        .upload-zone h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; color: var(--ink); margin: 0 0 .4rem; }
+        .upload-zone p { font-family: var(--font-sans); color: var(--ink-2); margin: 0; }
+        #fileInput { display: none; }
+        .upload-status { margin: .75rem 0 0; font-family: var(--font-mono); font-size: .85rem; color: var(--ink-2); min-height: 1.2em; }
+        .upload-status:empty { display: none; }
+        .upload-status.error { color: var(--red-600); }
+
+        /* ---- Workbench grid ---- */
+        .explorer-grid { display: none; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .explorer-grid.active { display: grid; }
+        .full-width { grid-column: 1 / -1; }
+
+        /* ---- Card anatomy: contour, stone head strip, white body ---- */
+        .card { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg);
+            overflow: hidden; box-shadow: var(--shadow-sm); animation: fadeIn .4s ease both; }
+        .card-header { padding: 12px 18px; background: var(--paper-2); border-bottom: 1px solid var(--line-2);
+            display: flex; align-items: center; gap: 12px; }
+        .card-header h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; color: var(--ink); }
+        .card-body { padding: 20px; }
+        .field-label { display: block; margin: 0 0 .5rem; font-family: var(--font-mono); font-size: .72rem; font-weight: 500;
+            letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+
+        /* ---- Metadata ---- */
+        .metadata-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .metadata-item { background: var(--surface); padding: 12px 14px; border-radius: var(--r-sm); border: 1px solid var(--line-2); }
+        .metadata-label { font-family: var(--font-mono); font-size: .7rem; color: var(--ink-3); text-transform: uppercase;
+            letter-spacing: .12em; margin-bottom: .3rem; }
+        .metadata-value { font-family: var(--font-mono); font-size: 1rem; color: var(--ink); word-break: break-all; }
+
+        /* ---- Raw bytes: dark data panel ---- */
+        .binary-container { background: var(--ink); border-radius: var(--r-md); padding: 1rem 1.25rem; max-height: 300px;
+            overflow-y: auto; font-family: var(--font-mono); font-size: .75rem; line-height: 1.8; }
+        .binary-row { display: flex; gap: 1rem; padding: .25rem 0; border-bottom: 1px solid color-mix(in srgb, var(--paper) 10%, transparent); }
+        .binary-offset { color: var(--yellow); min-width: 70px; }
+        .binary-hex { color: var(--paper); flex: 1; word-spacing: 4px; }
+        .binary-ascii { color: color-mix(in srgb, var(--paper) 62%, var(--ink)); min-width: 80px; }
+
+        /* ---- Legend: sample text on the same dark panel ---- */
+        .legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+        .legend-item { display: flex; align-items: center; gap: .5rem; font-family: var(--font-sans); font-size: .85rem; color: var(--ink-2); }
+        .legend-chip { background: var(--ink); border-radius: var(--r-xs); padding: 2px 7px; font-family: var(--font-mono); font-size: .72rem; min-width: 0; flex: none; }
+
+        /* ---- Image previews ---- */
+        .preview-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .image-preview-container { position: relative; flex: 1; display: flex; justify-content: center; align-items: center;
+            background: var(--paper-2); border: 1px solid var(--line-2); border-radius: var(--r-md); padding: 2.5rem 1rem 1rem; min-height: 200px; }
+        .preview-image { max-width: 100%; max-height: 300px; border-radius: var(--r-xs); box-shadow: var(--shadow-md); }
+        .size-badge { position: absolute; top: .6rem; left: .6rem; background: var(--ink); color: var(--paper);
+            padding: .25rem .75rem; border-radius: var(--r-pill); font-family: var(--font-mono); font-size: .72rem; font-weight: 500; }
+
+        /* ---- Pixel explorer ---- */
+        .pixel-explorer { position: relative; }
+        .resolution-note { font-family: var(--font-sans); color: var(--ink-2); font-size: .9rem; margin: 0 0 1rem; }
+        .resolution-note output { font-family: var(--font-mono); color: var(--ink); font-weight: 500; }
+        .pixel-layout { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; }
+        .pixel-thumb-col { flex: 0 0 auto; }
+        .pixel-canvas-col { flex: 1; min-width: 280px; }
+        .thumb-well { background: var(--paper-2); border-radius: var(--r-md); padding: .5rem; border: 1px solid var(--line-2); }
+        .thumb-well img { max-width: 150px; max-height: 150px; border-radius: var(--r-xs); display: block; }
+        .pixel-canvas-container { position: relative; display: flex; justify-content: center; padding: 1rem;
+            background: repeating-conic-gradient(var(--paper-3) 0% 25%, var(--paper-2) 0% 50%) 50% / 20px 20px;
+            border: 1px solid var(--line-2); border-radius: var(--r-md); }
+        #pixelCanvas { image-rendering: pixelated; cursor: crosshair; max-width: 100%; }
+        .pixel-info { position: absolute; display: none; z-index: 100; pointer-events: none; padding: .75rem;
+            background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-md); box-shadow: var(--shadow-lg);
+            font-family: var(--font-mono); font-size: .8rem; }
+        .pixel-info.visible { display: block; }
+        .pixel-color-box { width: 40px; height: 40px; border-radius: var(--r-xs); margin-bottom: .5rem; border: 1px solid var(--line-strong); }
+        .pixel-coords { color: var(--ink-3); margin-bottom: .25rem; }
+        .pixel-rgb { color: var(--blue-600); }
+        .pixel-hex { color: var(--ink); font-weight: 500; }
+        .pixel-binary { color: var(--ink-2); font-size: .65rem; margin-top: .25rem; }
+
+        /* ---- Controls ---- */
+        .controls { display: flex; gap: 1rem 1.25rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+        .control-group { display: flex; align-items: center; gap: .6rem; }
+        .control-group label { font-family: var(--font-mono); font-size: .72rem; font-weight: 500; text-transform: uppercase;
+            letter-spacing: .1em; color: var(--ink-3); }
+        .control-group output { font-family: var(--font-mono); font-size: .85rem; color: var(--ink); min-width: 2.75rem; }
+        input[type="range"] { -webkit-appearance: none; appearance: none; background: var(--track); height: 6px; border-radius: var(--r-pill); }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+            background: var(--yellow); border: 2px solid var(--ink); cursor: pointer; }
+        input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--yellow);
+            border: 2px solid var(--ink); cursor: pointer; }
+        .btn { background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); padding: .5rem 1.1rem;
+            border-radius: var(--r-pill); cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: .9rem;
+            transition: background-color .15s, border-color .15s; }
+        .btn:hover { background: var(--paper-2); }
+        .btn.active { background: var(--yellow); border-color: var(--yellow); color: var(--yellow-ink); }
+        .btn.active:hover { background: var(--yellow-600); border-color: var(--yellow-600); }
+
+        /* ---- Explanation callout: full solid blue block ---- */
+        .encoding-explanation { background: var(--blue-soft); color: var(--blue-ink); padding: 1rem 1.2rem;
+            border-radius: var(--r-lg); margin-top: 1.25rem; }
+        .encoding-explanation h4 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem;
+            font-family: var(--font-display); font-weight: 700; font-size: 1rem; }
+        .encoding-explanation h4 .ic { width: 18px; height: 18px; }
+        .encoding-explanation p { margin: 0; font-family: var(--font-sans); font-size: .9rem; line-height: 1.6; }
+        .encoding-explanation p + p { margin-top: .5rem; }
+        .encoding-explanation code { background: color-mix(in srgb, var(--paper) 18%, transparent); color: inherit;
+            padding: .05rem .4rem; border-radius: var(--r-xs); font-family: var(--font-mono); font-size: .85em; }
+
+        /* ---- Scrollbars ---- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: var(--r-pill); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--line-strong); }
+
+        /* ---- Motion: fade only ---- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card:nth-child(2) { animation-delay: .08s; }
+        .card:nth-child(3) { animation-delay: .16s; }
+        .card:nth-child(4) { animation-delay: .24s; }
+        @media (prefers-reduced-motion: reduce) { .card { animation: none; } }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 900px) {
+            .explorer-grid { grid-template-columns: 1fr; }
+            .metadata-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
-            .edu-header-inner { padding: 6px 16px; }
+            .edu-header-inner { padding-top: 6px; padding-bottom: 6px; }
             .edu-logo { width: 48px; height: 48px; }
             .edu-app-title { font-size: 15px; margin-left: 10px; padding-left: 10px; }
+            .page-head { padding: 20px var(--gutter) 22px; }
+            .sec { padding: 24px var(--gutter) 48px; }
+            .card-body { padding: 16px; }
+            .pixel-canvas-col { min-width: 0; flex-basis: 100%; }
+            .binary-container { overflow-x: auto; }
+            .binary-container .binary-row { width: max-content; }
+            .binary-container .binary-hex { flex: none; white-space: nowrap; }
         }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 34px 30px 70px;
-        }
-
-        /* ============================================================
-           Page header (eyebrow → solid-ink display title → lead)
-           ============================================================ */
-        header.page-head {
-            text-align: center;
-            margin-bottom: 2.25rem;
-            position: relative;
-        }
-
-        .edu-overline {
-            display: block;
-            font-family: var(--font-mono);
-            font-weight: 500; font-size: 12px;
-            letter-spacing: .14em; text-transform: uppercase;
-            color: var(--marigold-ink);
-            margin-bottom: 0.75rem;
-        }
-
-        .edu-lead {
-            font-family: var(--font-sans);
-            color: var(--ink-2);
-            font-size: 1.0625rem;
-            line-height: 1.6;
-            max-width: 36rem;
-            margin: 0 auto;
-        }
-
-        .edu-lead span {
-            color: var(--teal-ink);
-            font-weight: 600;
-        }
-
-        /* ============================================================
-           Upload Zone
-           ============================================================ */
-        .upload-zone {
-            border: 2px dashed var(--line-2);
-            border-radius: var(--r-xl);
-            padding: 3rem;
-            text-align: center;
-            background: var(--surface);
-            transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
-            cursor: pointer;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--marigold);
-            background: var(--paper-2);
-            box-shadow: var(--shadow-md);
-        }
-
-        .upload-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .upload-zone h3 {
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 1.4rem;
-            color: var(--ink);
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-zone p {
-            font-family: var(--font-sans);
-            color: var(--ink-2);
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        .upload-status {
-            margin: 0.75rem 0 0;
-            text-align: center;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--ink-2);
-            min-height: 1.2em;
-        }
-
-        .upload-status.error {
-            color: var(--coral-ink);
-        }
-
-        /* ============================================================
-           Main Grid Layout
-           ============================================================ */
-        .explorer-grid {
-            display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .explorer-grid.active {
-            display: grid;
-        }
-
-        /* ============================================================
-           Cards
-           ============================================================ */
-        .card {
-            background: var(--surface);
-            border-radius: var(--r-lg);
-            border: 1px solid var(--line);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow .2s ease;
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .card-header {
-            padding: 1rem 1.5rem;
-            background: var(--paper-2);
-            border-bottom: 1px solid var(--line);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .card-header .icon {
-            font-size: 1.3rem;
-        }
-
-        .card-header h2 {
-            font-family: var(--font-mono);
-            font-size: 0.78rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.14em;
-            color: var(--ink-2);
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        /* ============================================================
-           Metadata Section
-           ============================================================ */
-        .metadata-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .metadata-item {
-            background: var(--paper);
-            padding: 1rem;
-            border-radius: var(--r-sm);
-            border: 1px solid var(--line);
-        }
-
-        .metadata-label {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--ink-3);
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 0.3rem;
-        }
-
-        .metadata-value {
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            color: var(--teal-ink);
-            word-break: break-all;
-        }
-
-        /* ============================================================
-           Binary Data — dark editorial data panel
-           ============================================================ */
-        .binary-container {
-            background: var(--ink);
-            border-radius: var(--r-md);
-            padding: 1rem 1.25rem;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            line-height: 1.8;
-        }
-
-        .binary-row {
-            display: flex;
-            gap: 1rem;
-            padding: 0.25rem 0;
-            border-bottom: 1px solid rgba(251, 247, 240, 0.08);
-        }
-
-        .binary-offset {
-            color: var(--marigold);
-            min-width: 70px;
-        }
-
-        .binary-hex {
-            color: var(--teal-soft);
-            flex: 1;
-            word-spacing: 4px;
-        }
-
-        .binary-ascii {
-            color: rgba(251, 247, 240, 0.55);
-            min-width: 80px;
-        }
-
-        /* ============================================================
-           Image Preview
-           ============================================================ */
-        .image-preview-container {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: var(--r-md);
-            padding: 1rem;
-            min-height: 200px;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: var(--r-xs);
-            box-shadow: var(--shadow-md);
-        }
-
-        .size-badge {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: var(--ink);
-            color: var(--paper);
-            padding: 0.25rem 0.75rem;
-            border-radius: var(--r-pill);
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            font-weight: 500;
-        }
-
-        /* ============================================================
-           Pixel Grid Overlay
-           ============================================================ */
-        .pixel-explorer {
-            position: relative;
-        }
-
-        .pixel-canvas-container {
-            position: relative;
-            background: repeating-conic-gradient(var(--paper-3) 0% 25%, var(--paper-2) 0% 50%) 50% / 20px 20px;
-            border: 1px solid var(--line);
-            border-radius: var(--r-md);
-            padding: 1rem;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-
-        #pixelCanvas {
-            image-rendering: pixelated;
-            cursor: crosshair;
-        }
-
-        .pixel-info {
-            position: absolute;
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: var(--r-md);
-            padding: 0.75rem;
-            pointer-events: none;
-            z-index: 100;
-            display: none;
-            box-shadow: var(--shadow-lg);
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-        }
-
-        .pixel-info.visible {
-            display: block;
-        }
-
-        .pixel-color-box {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--r-xs);
-            margin-bottom: 0.5rem;
-            border: 1px solid var(--line-2);
-        }
-
-        .pixel-coords {
-            color: var(--ink-3);
-            margin-bottom: 0.25rem;
-        }
-
-        .pixel-rgb {
-            color: var(--teal-ink);
-        }
-
-        .pixel-hex {
-            color: var(--marigold-ink);
-        }
-
-        .pixel-binary {
-            color: var(--ink-2);
-            font-size: 0.65rem;
-            margin-top: 0.25rem;
-        }
-
-        /* ============================================================
-           Controls
-           ============================================================ */
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .control-group label {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--ink-3);
-        }
-
-        .control-group > span {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--ink-2);
-            min-width: 2.5rem;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            background: rgba(33, 30, 26, 0.12);
-            height: 8px;
-            border-radius: var(--r-pill);
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: var(--surface);
-            border: 2px solid var(--marigold);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            background: var(--surface);
-            border: 2px solid var(--marigold);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        input[type="range"]:focus-visible {
-            outline: none;
-            box-shadow: var(--focus-ring);
-        }
-
-        .btn {
-            background: var(--surface);
-            border: 1px solid var(--line-2);
-            color: var(--ink);
-            padding: 0.5rem 1rem;
-            border-radius: var(--r-pill);
-            cursor: pointer;
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: background .2s, color .2s, border-color .2s;
-        }
-
-        .btn:hover {
-            background: var(--paper-2);
-            border-color: var(--marigold);
-        }
-
-        .btn.active {
-            background: var(--marigold);
-            color: #fff;
-            border-color: var(--marigold);
-            box-shadow: var(--shadow-marigold);
-        }
-
-        /* Full Width Cards */
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        /* ============================================================
-           Scrollbar styling
-           ============================================================ */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--line-2);
-            border-radius: var(--r-pill);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--marigold);
-        }
-
-        /* ============================================================
-           Legend
-           ============================================================ */
-        .legend {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--line);
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: var(--font-sans);
-            font-size: 0.85rem;
-            color: var(--ink-2);
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: var(--r-xs);
-        }
-
-        /* ============================================================
-           Encoding explanation panel
-           ============================================================ */
-        .encoding-explanation {
-            background: var(--teal-soft);
-            padding: 1.1rem 1.25rem;
-            border-radius: var(--r-lg);
-            margin-top: 1rem;
-        }
-
-        .encoding-explanation h4 {
-            font-family: var(--font-display);
-            font-weight: 700;
-            color: var(--teal-ink);
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .encoding-explanation p {
-            font-family: var(--font-sans);
-            color: var(--teal-ink);
-            font-size: 0.875rem;
-            line-height: 1.6;
-        }
-
-        .encoding-explanation code {
-            background: rgba(10, 90, 82, 0.12);
-            padding: 0.1rem 0.4rem;
-            border-radius: var(--r-xs);
-            font-family: var(--font-mono);
-            color: var(--teal-ink);
-        }
-
-        /* ============================================================
-           Responsive
-           ============================================================ */
-        @media (max-width: 900px) {
-            .explorer-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .metadata-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* ============================================================
-           Animation
-           ============================================================ */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        .card:nth-child(2) { animation-delay: 0.1s; }
-        .card:nth-child(3) { animation-delay: 0.2s; }
-        .card:nth-child(4) { animation-delay: 0.3s; }
-        .card:nth-child(5) { animation-delay: 0.4s; }
     </style>
 </head>
-<body>
+<body class="edu">
     <header class="edu-header">
         <div class="edu-header-inner">
             <img class="edu-logo" alt="edulab" src="data:image/png;base64,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">
@@ -662,14 +401,14 @@
         </div>
     </header>
 
-    <div class="container">
+    <main>
         <header class="page-head">
-            <span class="edu-overline">Interactive demo · 4 min</span>
-            <p class="edu-lead">See what's <span>really</span> inside your images — metadata, raw bytes, and pixel-by-pixel colour.</p>
+            <p class="edu-lead">See what's <strong>really</strong> inside your images – metadata, raw bytes, and pixel-by-pixel colour.</p>
         </header>
 
+        <section class="sec" aria-label="Explorer">
         <div class="upload-zone" id="uploadZone">
-            <div class="upload-icon">📁</div>
+            <span class="badge badge-lg" aria-hidden="true"><i data-lucide="image-up" class="ic"></i></span>
             <h3>Drop an image here</h3>
             <p>or click to browse (PNG, JPG, GIF, WebP)</p>
             <input type="file" id="fileInput" accept="image/*">
@@ -680,16 +419,16 @@
             <!-- Metadata Card -->
             <div class="card">
                 <div class="card-header">
-                    <span class="icon">📋</span>
+                    <span class="badge" aria-hidden="true"><i data-lucide="file-text" class="ic"></i></span>
                     <h2>File Metadata</h2>
                 </div>
                 <div class="card-body">
                     <div class="metadata-grid" id="metadataGrid">
                         <!-- Populated by JS -->
                     </div>
-                    <div class="encoding-explanation">
-                        <h4>💡 What is Metadata?</h4>
-                        <p>Metadata is "data about data" — information stored alongside your image like file name, size, and format. The computer uses this to know how to read the file!</p>
+                    <div class="encoding-explanation edu-block">
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>What is Metadata?</h4>
+                        <p>Metadata is "data about data" – information stored alongside your image like file name, size, and format. The computer uses this to know how to read the file!</p>
                     </div>
                 </div>
             </div>
@@ -697,29 +436,29 @@
             <!-- Original vs Resized -->
             <div class="card">
                 <div class="card-header">
-                    <span class="icon">📐</span>
+                    <span class="badge" aria-hidden="true"><i data-lucide="scaling" class="ic"></i></span>
                     <h2>Size Comparison</h2>
                 </div>
                 <div class="card-body">
                     <div class="controls">
                         <div class="control-group">
-                            <label>Scale:</label>
+                            <label for="scaleSlider">Scale:</label>
                             <input type="range" id="scaleSlider" min="10" max="100" value="50">
-                            <span id="scaleValue">50%</span>
+                            <output id="scaleValue" for="scaleSlider">50%</output>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <div class="image-preview-container" style="flex: 1;">
+                    <div class="preview-row">
+                        <div class="image-preview-container">
                             <span class="size-badge" id="originalSize">Original</span>
                             <img id="originalPreview" class="preview-image" alt="Original">
                         </div>
-                        <div class="image-preview-container" style="flex: 1;">
+                        <div class="image-preview-container">
                             <span class="size-badge" id="resizedSize">Resized</span>
                             <img id="resizedPreview" class="preview-image" alt="Resized">
                         </div>
                     </div>
-                    <div class="encoding-explanation">
-                        <h4>💡 How Resizing Works</h4>
+                    <div class="encoding-explanation edu-block">
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>How Resizing Works</h4>
                         <p>When you shrink an image, the computer must decide which pixels to keep. This is called <code>downsampling</code>. Making images smaller reduces file size but loses detail!</p>
                     </div>
                 </div>
@@ -728,7 +467,7 @@
             <!-- Binary Data -->
             <div class="card full-width">
                 <div class="card-header">
-                    <span class="icon">🔢</span>
+                    <span class="badge" aria-hidden="true"><i data-lucide="binary" class="ic"></i></span>
                     <h2>Raw Binary Data (First 512 bytes)</h2>
                 </div>
                 <div class="card-body">
@@ -737,21 +476,21 @@
                     </div>
                     <div class="legend">
                         <div class="legend-item">
-                            <div class="legend-color" style="background: var(--marigold);"></div>
+                            <span class="legend-chip binary-offset" aria-hidden="true">0000</span>
                             <span>Offset (position in file)</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-color" style="background: var(--teal);"></div>
+                            <span class="legend-chip binary-hex" aria-hidden="true">FF D8</span>
                             <span>Hexadecimal bytes</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-color" style="background: var(--ink-3);"></div>
+                            <span class="legend-chip binary-ascii" aria-hidden="true">JFIF</span>
                             <span>ASCII representation</span>
                         </div>
                     </div>
-                    <div class="encoding-explanation">
-                        <h4>💡 What is Binary Data?</h4>
-                        <p>Computers store everything as numbers. Each <code>byte</code> (8 bits) can hold a value from 0-255. Here we show bytes in <code>hexadecimal</code> (base-16) because it's more compact: <code>FF</code> = 255, <code>00</code> = 0. The first bytes often contain the file's "magic number" — a signature that identifies the file type!</p>
+                    <div class="encoding-explanation edu-block">
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>What is Binary Data?</h4>
+                        <p>Computers store everything as numbers. Each <code>byte</code> (8 bits) can hold a value from 0-255. Here we show bytes in <code>hexadecimal</code> (base-16) because it's more compact: <code>FF</code> = 255, <code>00</code> = 0. The first bytes often contain the file's "magic number" – a signature that identifies the file type!</p>
                     </div>
                 </div>
             </div>
@@ -759,36 +498,36 @@
             <!-- Pixel Explorer -->
             <div class="card full-width">
                 <div class="card-header">
-                    <span class="icon">🎨</span>
+                    <span class="badge" aria-hidden="true"><i data-lucide="palette" class="ic"></i></span>
                     <h2>Pixel Explorer</h2>
                 </div>
                 <div class="card-body pixel-explorer">
                     <div class="controls">
                         <div class="control-group">
-                            <label>Resolution:</label>
+                            <label for="resolutionSlider">Resolution:</label>
                             <input type="range" id="resolutionSlider" min="8" max="64" value="32">
-                            <span id="resolutionValue">32px</span>
+                            <output id="resolutionValue" for="resolutionSlider">32px</output>
                         </div>
                         <div class="control-group">
-                            <label>Pixel Size:</label>
+                            <label for="zoomSlider">Pixel Size:</label>
                             <input type="range" id="zoomSlider" min="4" max="32" value="12">
-                            <span id="zoomValue">12px</span>
+                            <output id="zoomValue" for="zoomSlider">12px</output>
                         </div>
-                        <button class="btn" id="toggleGrid">Toggle Grid</button>
-                        <button class="btn" id="toggleValues">Toggle RGB Values</button>
+                        <button class="btn" id="toggleGrid" type="button">Toggle Grid</button>
+                        <button class="btn" id="toggleValues" type="button">Toggle RGB Values</button>
                     </div>
-                    <p style="font-family: var(--font-sans); color: var(--ink-2); font-size: 0.85rem; margin-bottom: 1rem;">
-                        📊 Downsampled to: <span id="resolutionDisplay" style="color: var(--teal-ink); font-family: var(--font-mono);">--</span>
+                    <p class="resolution-note">
+                        Downsampled to: <output id="resolutionDisplay">--</output>
                     </p>
-                    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;">
-                        <div style="flex: 0 0 auto;">
-                            <p style="font-family: var(--font-mono); color: var(--ink-3); font-size: 0.72rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.12em;">Original</p>
-                            <div style="background: var(--paper); border-radius: var(--r-md); padding: 0.5rem; border: 1px solid var(--line);">
-                                <img id="pixelOriginalThumb" style="max-width: 150px; max-height: 150px; border-radius: var(--r-xs); display: block;" alt="Original">
+                    <div class="pixel-layout">
+                        <div class="pixel-thumb-col">
+                            <p class="field-label">Original</p>
+                            <div class="thumb-well">
+                                <img id="pixelOriginalThumb" alt="Original">
                             </div>
                         </div>
-                        <div style="flex: 1; min-width: 300px;">
-                            <p style="font-family: var(--font-mono); color: var(--ink-3); font-size: 0.72rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.12em;">Pixelated View (hover to inspect)</p>
+                        <div class="pixel-canvas-col">
+                            <p class="field-label">Pixelated View (hover to inspect)</p>
                             <div class="pixel-canvas-container">
                                 <canvas id="pixelCanvas"></canvas>
                                 <div class="pixel-info" id="pixelInfo">
@@ -801,15 +540,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="encoding-explanation">
-                        <h4>💡 How Pixels Store Color</h4>
-                        <p>Each pixel uses 3 numbers (0-255) for <code style="color: var(--coral-ink);">Red</code>, <code style="color: var(--teal-ink);">Green</code>, and <code style="color: var(--sky-ink);">Blue</code>. Mixing these creates all colors! <code>R:255 G:0 B:0</code> = pure red. <code>R:255 G:255 B:255</code> = white. That's 256 × 256 × 256 = <strong>16.7 million</strong> possible colors!</p>
-                        <p style="margin-top: 0.5rem;">🔍 <strong>What you see above:</strong> The entire image downsampled to a tiny grid. Lower resolution = fewer pixels = you can see each one! This is exactly how computer vision models "see" images.</p>
+                    <div class="encoding-explanation edu-block">
+                        <h4><i data-lucide="lightbulb" class="ic" aria-hidden="true"></i>How Pixels Store Color</h4>
+                        <p>Each pixel uses 3 numbers (0-255) for <code>Red</code>, <code>Green</code>, and <code>Blue</code>. Mixing these creates all colors! <code>R:255 G:0 B:0</code> = pure red. <code>R:255 G:255 B:255</code> = white. That's 256 × 256 × 256 = <strong>16.7 million</strong> possible colors!</p>
+                        <p><strong>What you see above:</strong> The entire image downsampled to a tiny grid. Lower resolution = fewer pixels = you can see each one! This is exactly how computer vision models "see" images.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        </section>
+    </main>
 
     <script>
         // State
@@ -853,7 +593,7 @@
             if (file) processImage(file);
         });
 
-        // Upload limits — reject before decoding, so a huge file can't hang or crash the tab
+        // Upload limits – reject before decoding, so a huge file can't hang or crash the tab
         const MAX_FILE_BYTES = 30 * 1024 * 1024;
         const MAX_PIXELS = 32 * 1000 * 1000;
         const BINARY_PREVIEW_BYTES = 512;
@@ -877,12 +617,12 @@
                 return;
             }
             if (file.size > MAX_FILE_BYTES) {
-                failUpload(`File is ${formatBytes(file.size)} — the explorer handles up to ${formatBytes(MAX_FILE_BYTES)}.`);
+                failUpload(`File is ${formatBytes(file.size)} – the explorer handles up to ${formatBytes(MAX_FILE_BYTES)}.`);
                 return;
             }
             showStatus(`Loading ${file.name}…`, false);
 
-            // The hex view only ever shows the first bytes — no need to read the whole file
+            // The hex view only ever shows the first bytes – no need to read the whole file
             file.slice(0, BINARY_PREVIEW_BYTES).arrayBuffer()
                 .then(buf => {
                     fileBytes = new Uint8Array(buf);
@@ -894,7 +634,7 @@
             const img = new Image();
             img.onload = () => {
                 if (img.width * img.height > MAX_PIXELS) {
-                    failUpload(`Image is ${img.width} × ${img.height} px (${(img.width * img.height / 1e6).toFixed(1)} MP) — the explorer handles up to ${MAX_PIXELS / 1e6} MP.`, url);
+                    failUpload(`Image is ${img.width} × ${img.height} px (${(img.width * img.height / 1e6).toFixed(1)} MP) – the explorer handles up to ${MAX_PIXELS / 1e6} MP.`, url);
                     return;
                 }
                 if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
@@ -908,7 +648,7 @@
                 showStatus('', false);
             };
             img.onerror = () => {
-                failUpload(`Could not decode "${file.name}" — the file is corrupt or not a supported image format.`, url);
+                failUpload(`Could not decode "${file.name}" – the file is corrupt or not a supported image format.`, url);
             };
             img.src = url;
         }
@@ -949,7 +689,7 @@
             return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
         }
 
-        // Display binary data — built with textContent: the ASCII column is raw file bytes
+        // Display binary data – built with textContent: the ASCII column is raw file bytes
         function displayBinaryData() {
             binaryContainer.textContent = '';
             const bytesToShow = Math.min(BINARY_PREVIEW_BYTES, fileBytes.length);
@@ -1064,15 +804,15 @@
 
                     // Draw grid (warm ink hairline)
                     if (showGrid && zoomLevel >= 6) {
-                        ctx.strokeStyle = 'rgba(33, 30, 26, 0.18)';
+                        ctx.strokeStyle = 'rgba(28, 25, 23, 0.18)';
                         ctx.strokeRect(x * zoomLevel, y * zoomLevel, zoomLevel, zoomLevel);
                     }
 
                     // Draw RGB values
                     if (showValues && zoomLevel >= 18) {
                         const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-                        ctx.fillStyle = brightness > 128 ? '#211E1A' : '#FBF7F0';
-                        ctx.font = `bold ${Math.floor(zoomLevel / 4.5)}px 'DM Mono', monospace`;
+                        ctx.fillStyle = brightness > 128 ? '#1C1917' : '#FFFFFF';
+                        ctx.font = `bold ${Math.floor(zoomLevel / 4.5)}px 'Roboto Mono', monospace`;
                         ctx.textAlign = 'center';
                         ctx.fillText(`${r}`, x * zoomLevel + zoomLevel/2, y * zoomLevel + zoomLevel/3 + 2);
                         ctx.fillText(`${g}`, x * zoomLevel + zoomLevel/2, y * zoomLevel + zoomLevel/2 + 2);
@@ -1165,6 +905,9 @@
 
         // Initial toggle state
         document.getElementById('toggleGrid').classList.add('active');
+
+        // Icons (Lucide loads deferred; the page works without it)
+        window.addEventListener('DOMContentLoaded', () => { if (window.lucide) window.lucide.createIcons(); });
     </script>
 </body>
 </html>
